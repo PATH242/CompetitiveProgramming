@@ -1,3 +1,9 @@
+/*saves for each value in the array the value of itself%3. counts the number of 0s, 1s, and 2s. If the zeros were more than the ones
+and twos+1, then it's impossible to have them in an order in which no zero is followed by another 0. otherwise it's possible. 
+It's also impossible to have them in a good order if there were ones and twos but no zeros.
+we try printing something like 010102222, or something like 11110202222
+*/
+
 #include <bits/stdc++.h>
 using namespace std;
 typedef long long int ll;
