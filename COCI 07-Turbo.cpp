@@ -1,3 +1,8 @@
+/* Counts number of elements that are going to shift a[i] to the right, and number of elements that are going to shift a[i] to the left.
+answer is abs ( ( (i+1) + right shifts - left shift) - a[i]) 
+right shifts are counted in s[N], left shifts are counted in p[N]
+*/
+
 #include <bits/stdc++.h>
 #include <ext/pb_ds/assoc_container.hpp>
 #include <ext/pb_ds/tree_policy.hpp>
