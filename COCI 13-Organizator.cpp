@@ -1,4 +1,4 @@
-/* since we want to get he maximum number of participants in finals, and we can't have a club participate if their club size
+/* since we want to get the maximum number of participants in finals, and we can't have a club participate if their club size
 isn't divisable by the team size, we try all possible team sizes and use sieve to get the maximum number of
 eligible participants
 */
