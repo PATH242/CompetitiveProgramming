@@ -1,5 +1,5 @@
 /* to get the minimum number of machines needed to execute the jobs with no delays later than d days after the day
-the job was submitted in, we binary search using a function that checks if jobs can be executed in x days */
+the job was submitted in, we binary search using a function that checks if jobs can be executed using x machines */
 
 #include <bits/stdc++.h>
 using namespace std;
