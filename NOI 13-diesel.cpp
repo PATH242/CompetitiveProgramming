@@ -1,4 +1,4 @@
-/* to get the maximum cost we can get to reach cell (m-1,n-1), we can use BFS to get the best path for every cell
+/* to get the maximum cost we can get while reaching cell (m-1,n-1), we can use BFS to get the best path for every cell
 and handle the case in which reaching that cell is impossible*/
 
 #include <bits/stdc++.h>
