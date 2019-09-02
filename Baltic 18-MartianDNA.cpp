@@ -2,7 +2,9 @@
 the function that checks if there exists a substring of size x in the main string that contains more than or equal the
 minimum number of each of the R nucleobases uses sliding window to check all the valid substrings of size x.
 rc is equal to the number of nucleobases we have more than or equal the minimum required number of them in the current substring
-if rc equals to R at any given time then we've found a valid substring of size x so chk returns 1*/
+if rc equals to R at any given time then we've found a valid substring of size x so chk returns 1
+ps: the answer is impossible if all the Xs we've checked returned false, so we output impossible when the binary search loop has reached 
+its end and found no valid x*/
 
 
 
