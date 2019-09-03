@@ -1,4 +1,10 @@
-/* This takes O(N*K) and only gets 95% of the cases... for every number of the K numbers, we start an O(N) loop that works with having a 
+/* This takes O(N*K) and only gets 95% of the cases... 
+
+problem: you'll be given an array of size n and k integers, for every (x) of the k integers, you add the first x numbers of the array
+to your queue and alice starts, she takes the biggest element then adds the next element in the array if it exists, bob plays next
+and does the same, output alice's score - bob's.
+
+approach: for every number of the K numbers, we start an O(N) loop that works with having a 
 pointer to the maximum number we have so far and a frequency array, if fr[mx] was equal to zero at any given time, we subtract
 1 from mx till it reaches f[mx]!=0.... and if the number we're adding this turn is >=mx, we give it to the next 
 player automatically, if not, we just add 1 to fr[x], this way, mx would never increase, it'll only decrease ...
