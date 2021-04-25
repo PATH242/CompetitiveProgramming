@@ -1,4 +1,4 @@
-
+///input is a string, generate it
 
 #include <iostream>
 #include <string>
