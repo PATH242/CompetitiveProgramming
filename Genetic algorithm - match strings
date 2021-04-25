@@ -1,36 +1,46 @@
-//input is string, generate it
+///input is a string, generate it
 
 #include <iostream>
 #include <string>
 #include <vector>
 #include <algorithm>
+#include <random>
+#include <chrono>
+
 using namespace std;
+///to ensure better randomness than rand()
+mt19937 rng(chrono::steady_clock::now().time_since_epoch().count());
+#define rnd(s ,e) uniform_int_distribution<int>(s, e)(rng)
 
-const int generationSize=10;
+///the constants used
+const int generationSize=10,numberOfGenes=52,probabilityOfInhertiance=50,probabilityOfMutation=20,probabilityOfMating=60;
+///the string we'll try to generate
 string desiredString;
+///a boolean to halt the code when the string is found
 bool stringFound=0;
-int n,numberOfGenerations; ///n is size of the desiredString
 
-string GENES= "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz";
+int n,numberOfGenerations; ///n is size of the desiredString, numberOfGenerations is a counter to count the generations made so far
+
+string GENES= "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz"; ///the genes or characters we randomly choose from
 
 class Individual{
 public:
     string genes;
-    int fitness;
+    int fitness; ///fitness is the number of characters that are different from the desired string
+    ///the lower the fitness the better
 
     Individual(){
         genes="";
         for(int i=0;i<n;i++)
-            genes.push_back(GENES[rand()%52]);
-
+            genes.push_back(GENES[rnd(0,numberOfGenes-1)]);
         calculateFitness();
     }
     Individual mate(const Individual& temp){
         Individual child;
         int probability;
         for(int i=0;i<n;i++){
-            probability= (rand()%100);
-            if(probability<50)
+            probability= rnd(0,99);
+            if(probability<probabilityOfInhertiance)
                 child.genes[i]= this->genes[i];
             else
                 child.genes[i]= temp.genes[i];
@@ -43,9 +53,9 @@ public:
     void mutate(){
         int probability;
         for(int i=0;i<n;i++){
-            probability= (rand()%100);
-            if(probability>=80){
-                genes[i]=GENES[rand()%52];
+            probability= (rnd(0,99));
+            if(probability<probabilityOfMutation){
+                genes[i]=GENES[rnd(0,numberOfGenes-1)];
             }
         }
     }
@@ -56,8 +66,10 @@ public:
             if(genes[i]!=desiredString[i])
                 temp++;
         }
-        if(!fitness)
+        if(!temp){
             stringFound=1;
+        }
+
         return fitness= temp;
     }
 
@@ -65,7 +77,7 @@ public:
         return(this->fitness<right.fitness);
     }
     friend ostream &operator<<(ostream& output, Individual& I){
-        output<<I.genes<<'\n';
+        output<<I.genes<<' ';
         return output;
     }
 };
@@ -77,38 +89,33 @@ void makeInitialPopulation(){
         Individual I;
         population.push_back(I);
     }
+    ///sort to make most similar first
+    sort(population.begin(),population.end());
     return;
 }
 
 
 void selectAdvancedIndividuals(){
-    ///sort to have biggest(least similar) first
-    for(int i=0;i<population.size();i++){
-        for(int j=i+1;j<population.size();j++){
-            if(population[i]<population[j])
-                swap(population[i],population[j]);
-        }
-    }
+    ///sort to have least similar first
+    sort(population.begin(),population.end());
+    reverse(population.begin(),population.end());
+
     vector<Individual> newPopulation;
     Individual temp;
     int probability;
     ///mating with giving most similar higher probability in mating
     for(int i=population.size()-1;i>=0;i--){
         for(int j=i-1;j>=0;j--){
-            probability= (rand()%100)+i*2;
-            if(probability>=60){
+            probability= (rnd(0,99))+i*2; ///give higher probability in mating to more similar individuals
+            if(probability>=probabilityOfMating){
                 temp= population[i].mate(population[j]);
                 newPopulation.push_back(temp);
             }
         }
     }
-    ///sort to have biggest(least similar) last
-    for(int i=0;i<newPopulation.size();i++){
-        for(int j=i+1;j<newPopulation.size();j++){
-            if(newPopulation[j]<newPopulation[i])
-                swap(newPopulation[i],newPopulation[j]);
-        }
-    }
+    ///sort to have least similar last
+    sort(newPopulation.begin(),newPopulation.end());
+
     ///eliminate from the new population so that it suits the generation size
     while(newPopulation.size()>generationSize)
         newPopulation.pop_back();
@@ -128,8 +135,11 @@ int main() {
 
     while(!stringFound){
         numberOfGenerations++;
-        cout<<numberOfGenerations<<" "<<population[0];
+        cout<<"generation number "<<numberOfGenerations<<" has the best individual: "
+        <<population[0];
+
         selectAdvancedIndividuals();
+        cout<<"and generated: "<<population[0]<<'\n';
     }
     cout<<"We found the string, and it took us "<<numberOfGenerations<<" generations to get it\n";
     return 0;
