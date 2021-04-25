@@ -1,0 +1,146 @@
+
+
+#include <iostream>
+#include <string>
+#include <vector>
+#include <algorithm>
+#include <random>
+#include <chrono>
+
+using namespace std;
+///to ensure better randomness than rand()
+mt19937 rng(chrono::steady_clock::now().time_since_epoch().count());
+#define rnd(s ,e) uniform_int_distribution<int>(s, e)(rng)
+
+///the constants used
+const int generationSize=10,numberOfGenes=52,probabilityOfInhertiance=50,probabilityOfMutation=20,probabilityOfMating=60;
+///the string we'll try to generate
+string desiredString;
+///a boolean to halt the code when the string is found
+bool stringFound=0;
+
+int n,numberOfGenerations; ///n is size of the desiredString, numberOfGenerations is a counter to count the generations made so far
+
+string GENES= "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz"; ///the genes or characters we randomly choose from
+
+class Individual{
+public:
+    string genes;
+    int fitness; ///fitness is the number of characters that are different from the desired string
+    ///the lower the fitness the better
+
+    Individual(){
+        genes="";
+        for(int i=0;i<n;i++)
+            genes.push_back(GENES[rnd(0,numberOfGenes-1)]);
+        calculateFitness();
+    }
+    Individual mate(const Individual& temp){
+        Individual child;
+        int probability;
+        for(int i=0;i<n;i++){
+            probability= rnd(0,99);
+            if(probability<probabilityOfInhertiance)
+                child.genes[i]= this->genes[i];
+            else
+                child.genes[i]= temp.genes[i];
+        }
+        child.mutate();
+        child.calculateFitness();
+        return child;
+    }
+
+    void mutate(){
+        int probability;
+        for(int i=0;i<n;i++){
+            probability= (rnd(0,99));
+            if(probability<probabilityOfMutation){
+                genes[i]=GENES[rnd(0,numberOfGenes-1)];
+            }
+        }
+    }
+
+    int calculateFitness(){
+        int temp=0;
+        for(int i=0;i<n;i++){
+            if(genes[i]!=desiredString[i])
+                temp++;
+        }
+        if(!temp){
+            stringFound=1;
+        }
+
+        return fitness= temp;
+    }
+
+    bool operator<(const Individual& right){
+        return(this->fitness<right.fitness);
+    }
+    friend ostream &operator<<(ostream& output, Individual& I){
+        output<<I.genes<<' ';
+        return output;
+    }
+};
+
+vector<Individual> population;
+
+void makeInitialPopulation(){
+    for(int i=0;i<generationSize;i++){
+        Individual I;
+        population.push_back(I);
+    }
+    ///sort to make most similar first
+    sort(population.begin(),population.end());
+    return;
+}
+
+
+void selectAdvancedIndividuals(){
+    ///sort to have least similar first
+    sort(population.begin(),population.end());
+    reverse(population.begin(),population.end());
+
+    vector<Individual> newPopulation;
+    Individual temp;
+    int probability;
+    ///mating with giving most similar higher probability in mating
+    for(int i=population.size()-1;i>=0;i--){
+        for(int j=i-1;j>=0;j--){
+            probability= (rnd(0,99))+i*2; ///give higher probability in mating to more similar individuals
+            if(probability>=probabilityOfMating){
+                temp= population[i].mate(population[j]);
+                newPopulation.push_back(temp);
+            }
+        }
+    }
+    ///sort to have least similar last
+    sort(newPopulation.begin(),newPopulation.end());
+
+    ///eliminate from the new population so that it suits the generation size
+    while(newPopulation.size()>generationSize)
+        newPopulation.pop_back();
+
+    population= newPopulation;
+    return;
+}
+
+
+
+int main() {
+    cout<<"Please enter the string you desire to generate:\n";
+    cin>>desiredString;
+
+    n= desiredString.size();
+    makeInitialPopulation();
+
+    while(!stringFound){
+        numberOfGenerations++;
+        cout<<"generation number "<<numberOfGenerations<<" has the best individual: "
+        <<population[0];
+
+        selectAdvancedIndividuals();
+        cout<<"and generated: "<<population[0]<<'\n';
+    }
+    cout<<"We found the string, and it took us "<<numberOfGenerations<<" generations to get it\n";
+    return 0;
+}
